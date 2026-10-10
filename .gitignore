@@ -10,3 +10,4 @@ site/public/
 site/preview/
 # local working notes — kept out of the public repo
 CLAUDE.md
+__pycache__/
