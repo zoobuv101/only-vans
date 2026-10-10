@@ -226,7 +226,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
   <p class="hero__credit">{esc(hero["place"] or "On the road")} · {hero["when"]:%b %Y}</p>
 </section>
 <main class="page">
-  <p class="lede">Lola, the white van with the teal roof, is Annette's, and Ian is her designated driver. Ted, the grey one, is JC's. More often than not the two vans set off together. This is where their trips are written up, straight from the Instagram feed.</p>
+  <p class="lede">Lola, the white van with the teal roof, is Annette's, and Ian is her designated driver. Ted, the grey one, is JC's, and Ceri is his passenger princess. More often than not the two vans set off together. This is where their trips are written up, straight from the Instagram feed.</p>
   <dl class="log">
     <div><dt>Vans</dt><dd>Ted &amp; Lola</dd></div>
     <div><dt>Crew</dt><dd>Annette, Ian, JC, Ceri</dd></div>
