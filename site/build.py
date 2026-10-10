@@ -186,6 +186,12 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
             f'<span><time datetime="{p["when"]:%Y-%m-%d}">{where}{span(p["when"], p["end"])}</time>'
             f'<h3>{esc(p["title"])}</h3><p>{esc(plain(p["caption"]))}</p></span></a></li>')
     places = len({p["place"] for p in posts if p["place"]})
+    # trips, not entries: back-to-back campsite stays (Kendal -> Moss Howe) are one trip
+    trips, last_end = 0, None
+    for c in sorted(json.load(open(os.path.join(ROOT, "data", "campsites.json"))), key=lambda c: c["date"]):
+        if last_end is None or c["date"] > last_end:
+            trips += 1
+        last_end = max(last_end or "", c.get("end") or c["date"])
     # one map pin per spot; several adventures at the same spot share a pin
     # campsites (data/campsites.json) share a pin with any adventure at the same spot
     pins = {}
@@ -220,7 +226,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
   <dl class="log">
     <div><dt>Vans</dt><dd>Ted &amp; Lola</dd></div>
     <div><dt>Crew</dt><dd>Annette, Ian, JC, Ceri</dd></div>
-    <div><dt>Adventures</dt><dd>{len(posts)}</dd></div>
+    <div><dt>Trips</dt><dd>{trips}</dd></div>
     <div><dt>Places</dt><dd>{places}</dd></div>
   </dl>
   <h2 id="map">Where we've been</h2>
