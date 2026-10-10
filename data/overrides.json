@@ -1,7 +1,7 @@
 {
  "_note": "Hand-written extras per Instagram post id. Optional keys: title, place, vans, date + end (trip dates, YYYY-MM-DD; set the order and replace the Instagram posting date), cover (index into media), extra (list of img/gp/... photos added after the Instagram ones), at ([lat, lon] for the map, 3 dp), hide. The sync never touches this file; posts without an entry fall back to their caption.",
- "18106948964248287": {"title": "Coffee, pies and a castle at Sizergh", "place": "Sizergh, Lake District", "date": "2026-09-18", "end": "2026-09-25", "at": [54.284, -2.771]},
- "18177789175431137": {"title": "Witherslack, Cartmel and Dragon the cockerel", "place": "Witherslack, Lake District", "cover": 3, "date": "2026-09-18", "end": "2026-09-25", "extra": ["img/gp/IMG_3213.jpg", "img/gp/IMG_3215.jpg", "img/gp/IMG_3216.jpg", "img/gp/IMG_3237.jpg"], "at": [54.258, -2.882]},
+ "18106948964248287": {"title": "Coffee, pies and a castle at Sizergh", "place": "Sizergh, Lake District", "date": "2026-09-18", "end": "2026-09-23", "at": [54.284, -2.771]},
+ "18177789175431137": {"title": "Witherslack, Cartmel and Dragon the cockerel", "place": "Moss Howe Farm, Witherslack, Lake District", "cover": 3, "date": "2026-09-23", "end": "2026-09-25", "extra": ["img/gp/IMG_3213.jpg", "img/gp/IMG_3215.jpg", "img/gp/IMG_3216.jpg", "img/gp/IMG_3237.jpg"], "at": [54.258, -2.882]},
  "17988168282082501": {"title": "Dining at L'Enclume", "place": "Cartmel, Lake District", "cover": 7, "date": "2026-09-24", "extra": ["img/gp/lenclume-1.jpg", "img/gp/lenclume-2.jpg"], "at": [54.201, -2.953]},
  "17866790721659177": {"title": "Another day, another stop", "place": "Grange-over-Sands, Lake District", "date": "2026-09-23", "at": [54.197, -2.904]},
  "18040842329831763": {"title": "Ted & Lola on adjacent pitches", "place": "Lynmouth Holiday Retreat, Devon", "date": "2026-05-29", "end": "2026-05-31", "extra": ["img/gp/IMG_2134.jpg"], "at": [51.218, -3.83]},

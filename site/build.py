@@ -46,7 +46,7 @@ def caption_html(text: str) -> str:
         return f'<a href="{url}">@{esc(h)}</a>'
     paras = [p.strip() for p in text.split("\n") if p.strip()]
     url = lambda m: f'<a href="{m.group(0)}">{m.group(0).split("//", 1)[1].rstrip("/")}</a>'  # noqa: E731
-    link = lambda t: re.sub(r"https?://[^\s<]+", url, t) if "://" in t else re.sub(r"@([A-Za-z0-9_.]+)", handle, t)  # noqa: E731
+    link = lambda t: re.sub(r"https?://[^\s<]*[^\s<.,;:!?)]", url, t) if "://" in t else re.sub(r"@([A-Za-z0-9_.]+)", handle, t)  # noqa: E731
     return "\n".join("<p>" + link(esc(p)) + "</p>" for p in paras)
 
 
@@ -163,7 +163,7 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
             + ('' if over else '<div class="stripe" aria-hidden="true"></div>\n')
             + body.replace("{{up}}", up) +
             '\n<footer><span class="stripe" aria-hidden="true"></span>Lola (white) and Ted (grey), two VW campers that like to travel together. '
-            f'Stories and photos from <a href="{IG}">@tedandlolasonlyvans</a>; site built by Claude.'
+            f'Stories and photos from <a href="{IG}">@tedandlolasonlyvans</a>. Ian\'s astronomy pictures: <a href="https://uv101.uk">uv101.uk</a>. Site built by Claude.'
             f'<br>© {datetime.date.today().year} only-vans.uk. Photos are ours; please ask before reusing them.</footer>\n')
     if not full:
         return head + page
