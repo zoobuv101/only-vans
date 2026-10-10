@@ -97,7 +97,7 @@ def load_posts() -> list[dict]:
         when = datetime.date.fromisoformat(o["date"]) if dated else local(p["timestamp"]).date()
         end = datetime.date.fromisoformat(o["end"]) if o.get("end") else None
         title = o.get("title") or plain(p["caption"], 60) or "On the road"
-        p.update(title=title, place=o.get("place", ""), at=o.get("at"), vans=o.get("vans", "Ted & Lola"),
+        p.update(title=title, place=o.get("place", ""), at=o.get("at"), notes=o.get("notes", ""), vans=o.get("vans", "Ted & Lola"),
                  when=when, end=end, dated=dated, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
                  slug=f"{when:%Y-%m-%d}-{slugify(title)}")
         out.append(p)
@@ -185,13 +185,20 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
             f'<h3>{esc(p["title"])}</h3><p>{esc(plain(p["caption"]))}</p></span></a></li>')
     places = len({p["place"] for p in posts if p["place"]})
     # one map pin per spot; several adventures at the same spot share a pin
+    # campsites (data/campsites.json) share a pin with any adventure at the same spot
     pins = {}
+    for c in json.load(open(os.path.join(ROOT, "data", "campsites.json"))):
+        if c.get("at"):
+            pins.setdefault(tuple(c["at"]), {"camps": [], "posts": []})["camps"].append(c)
     for p in sorted(posts, key=lambda x: x["when"]):
         if p["at"]:
-            pins.setdefault(tuple(p["at"]), []).append(p)
-    pin_data = [{"at": list(k), "html": f'<b>{esc(v[0]["place"])}</b>' + "".join(
-        f'<br><a href="adventures/{q["slug"]}.html">{esc(q["title"])}</a> <span>{span(q["when"], q["end"])}</span>' for q in v)}
-        for k, v in pins.items()]
+            pins.setdefault(tuple(p["at"]), {"camps": [], "posts": []})["posts"].append(p)
+    pin_data = []
+    for k, v in pins.items():
+        head = "".join(f'<b>{esc(c["name"])}</b><br><span>Campsite · {span(datetime.date.fromisoformat(c["date"]), datetime.date.fromisoformat(c["end"]) if c.get("end") else None)}</span><br>'
+                       for c in v["camps"]) or f'<b>{esc(v["posts"][0]["place"])}</b><br>'
+        pin_data.append({"at": list(k), "camp": bool(v["camps"]) and not v["posts"], "html": head + "<br>".join(
+            f'<a href="adventures/{q["slug"]}.html">{esc(q["title"])}</a> <span>{span(q["when"], q["end"])}</span>' for q in v["posts"])})
     body = f'''<section class="hero">
   <img src="{hm["src"]}" alt="Lola, the white VW camper with a teal pop-top, and Ted, the grey one, roofs up on a sunny campsite" width="{hm["w"]}" height="{hm["h"]}">
   <div class="hero__text">
@@ -225,7 +232,8 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
     }}).addTo(map);
     var teal = getComputedStyle(document.documentElement).getPropertyValue("--teal-bright").trim() || "#36b3aa";
     pins.forEach(function (p) {{
-      L.circleMarker(p.at, {{ radius: 9, color: "#ffffff", weight: 2, fillColor: teal, fillOpacity: 1 }})
+      L.circleMarker(p.at, p.camp ? {{ radius: 8, color: teal, weight: 3, fillColor: "#ffffff", fillOpacity: 1 }}
+                                  : {{ radius: 9, color: "#ffffff", weight: 2, fillColor: teal, fillOpacity: 1 }})
         .bindPopup(p.html).addTo(map);
     }});
     map.fitBounds(pins.map(function (p) {{ return p.at; }}), {{ padding: [30, 30] }});
@@ -264,6 +272,7 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
     <div><dt>Photos</dt><dd>{len(p["media"])}</dd></div>
   </dl>
   {caption_html(p["caption"])}
+  {caption_html(p["notes"])}
   {'<div class="photos">' + chr(10) + figs + chr(10) + '  </div>' if len(p["media"]) > 1 else ""}
   {f'<p><a href="{p["permalink"]}">See this post on Instagram</a></p>' if p["permalink"] else ""}
   {nav}
