@@ -195,6 +195,9 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
     for p in sorted(posts, key=lambda x: x["when"]):
         if p["at"]:
             pins.setdefault(tuple(p["at"]), {"camps": [], "posts": []})["posts"].append(p)
+    routes = json.load(open(os.path.join(ROOT, "data", "routes.json")))
+    route_data = [{"label": f'Lola\'s route · {r["campsite"]} · {span(datetime.date.fromisoformat(r["date"]), datetime.date.fromisoformat(r["end"]) if r.get("end") else None)}',
+                   "segments": r["segments"]} for r in routes]
     pin_data = []
     for k, v in pins.items():
         head = "".join(f'<b>{esc(c["name"])}</b><br><span>Campsite · {span(datetime.date.fromisoformat(c["date"]), datetime.date.fromisoformat(c["end"]) if c.get("end") else None)}</span><br>'
@@ -222,6 +225,8 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
   <h2 id="map">Where we've been</h2>
   <link rel="stylesheet" href="{LEAFLET}leaflet.min.css">
   <div class="map" id="ov-map" role="region" aria-label="Map of everywhere Ted and Lola have been"></div>
+  <p class="map-note">Lines are Lola's actual routes from her GPS tracker (trips from May 2025). They stop a few kilometres short of home.</p>
+  <script type="application/json" id="ov-routes">{json.dumps(route_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")}</script>
   <script type="application/json" id="ov-pins">{json.dumps(pin_data, ensure_ascii=False).replace("</", "<\\/")}</script>
   <script src="{LEAFLET}leaflet.min.js"></script>
   <script>
@@ -233,6 +238,11 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
       maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }}).addTo(map);
     var teal = getComputedStyle(document.documentElement).getPropertyValue("--teal-bright").trim() || "#36b3aa";
+    var routes = JSON.parse(document.getElementById("ov-routes").textContent);
+    routes.forEach(function (r) {{
+      L.polyline(r.segments, {{ color: teal, weight: 3.5, opacity: 0.85, lineJoin: "round" }})
+        .bindTooltip(r.label, {{ sticky: true }}).addTo(map);
+    }});
     pins.forEach(function (p) {{
       L.circleMarker(p.at, p.camp ? {{ radius: 8, color: teal, weight: 3, fillColor: "#ffffff", fillOpacity: 1 }}
                                   : {{ radius: 9, color: "#ffffff", weight: 2, fillColor: teal, fillOpacity: 1 }})

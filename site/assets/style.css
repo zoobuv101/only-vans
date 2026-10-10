@@ -120,6 +120,7 @@ footer .stripe { margin-bottom: 1.5rem; height: 4px; }
 @media (prefers-reduced-motion: no-preference) { .photos a:hover img { transform: scale(1.04); } }
 
 /* map of everywhere: Leaflet + OpenStreetMap tiles, teal pins */
+.map-note { font: 400 0.8rem/1.5 var(--mono); color: var(--dim); }
 .map { height: clamp(22rem, 60vh, 34rem); border-radius: 6px; border: 1px solid var(--rule); z-index: 0; background: var(--panel); }
 .map .leaflet-popup-content-wrapper, .map .leaflet-popup-tip { background: var(--panel); color: var(--ink); }
 .map .leaflet-popup-content { font: 400 0.95rem/1.5 var(--body); margin: 0.8rem 1rem; }
