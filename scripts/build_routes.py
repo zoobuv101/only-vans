@@ -6,7 +6,7 @@
 Fetches POST /v1/devices/history per trip day (cached in data/raw/gps/, gitignored), keeps the
 points where Lola was moving, cuts everything within PRIVACY_KM of home (home = HA zone.home,
 cached in data/raw/gps/.home.json, never committed), splits on gaps, simplifies to ~SIMPLIFY_M and
-rounds to 4 dp. dtTracker is UTC (checked against photo times 2026-10-10). Trip dates come from
+rounds to 4 dp. Output: data/raw/gps/routes.json (local, gitignored) — routes are OFF the public map. dtTracker is UTC (checked against photo times 2026-10-10). Trip dates come from
 data/campsites.json, so a new trip only needs a campsite entry. Needs GPSLIVE_API_KEY.
 """
 import datetime as D, json, math, os, sys, time, urllib.error, urllib.request
@@ -128,7 +128,7 @@ def main():
             if km(s[-1], home) < PRIVACY_KM + 1.5:
                 s.append(min((a34[0], a34[-1]), key=lambda e: km(e, s[-1])))
     print(f"A34 connector: {len(a34)} points, {len(ends)} route ends joined")
-    with open(os.path.join(ROOT, "data", "routes.json"), "w") as f:
+    with open(os.path.join(RAW, "routes.json"), "w") as f:  # local only; see SHOW_ROUTES in site/build.py
         json.dump({"connector": a34, "routes": routes}, f, separators=(",", ":"))
         f.write("\n")
 

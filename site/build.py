@@ -27,6 +27,9 @@ LONDON = ZoneInfo("Europe/London")
 HERO = ("18115457765014274", 0)  # both vans, tops up, outside Winchester
 NAV = [("adventures", "index.html#adventures", "Adventures"), ("map", "index.html#map", "Map"), ("ig", IG, "Instagram")]
 LEAFLET = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/"
+# Lola's GPS routes: data kept locally (data/raw/gps/routes.json, gitignored); off the public map
+# since 2026-10-10 at Ian's request. Set True (and copy the file to data/routes.json) to show them again.
+SHOW_ROUTES = False
 FONTS = ("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700"
          "&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600&family=DM+Mono:wght@400;500&display=swap")
 # Old and current handles of the van account both mean "Ted & Lola" in captions.
@@ -201,9 +204,10 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
     for p in sorted(posts, key=lambda x: x["when"]):
         if p["at"]:
             pins.setdefault(tuple(p["at"]), {"camps": [], "posts": []})["posts"].append(p)
-    rj = json.load(open(os.path.join(ROOT, "data", "routes.json")))
+    rpath = os.path.join(ROOT, "data", "routes.json")
+    rj = json.load(open(rpath)) if SHOW_ROUTES and os.path.exists(rpath) else {"connector": [], "routes": []}
     routes = rj["routes"]
-    route_data = [{"label": "", "segments": [rj["connector"]]}] + [{"label": f'Lola\'s route · {r["campsite"]} · {span(datetime.date.fromisoformat(r["date"]), datetime.date.fromisoformat(r["end"]) if r.get("end") else None)}',
+    route_data = ([{"label": "", "segments": [rj["connector"]]}] if rj["connector"] else []) + [{"label": f'Lola\'s route · {r["campsite"]} · {span(datetime.date.fromisoformat(r["date"]), datetime.date.fromisoformat(r["end"]) if r.get("end") else None)}',
                    "segments": r["segments"]} for r in routes]
     pin_data = []
     for k, v in pins.items():
@@ -232,7 +236,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
   <h2 id="map">Where we've been</h2>
   <link rel="stylesheet" href="{LEAFLET}leaflet.min.css">
   <div class="map" id="ov-map" role="region" aria-label="Map of everywhere Ted and Lola have been"></div>
-  <p class="map-note">Lines are Lola's actual routes from her GPS tracker (trips from May 2025). They start and finish on the main road, not at our front door.</p>
+  {'<p class="map-note">Lines are Lola' + "'" + 's actual routes from her GPS tracker. They start and finish on the main road, not at our front door.</p>' if route_data else ""}
   <script type="application/json" id="ov-routes">{json.dumps(route_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")}</script>
   <script type="application/json" id="ov-pins">{json.dumps(pin_data, ensure_ascii=False).replace("</", "<\\/")}</script>
   <script src="{LEAFLET}leaflet.min.js"></script>
