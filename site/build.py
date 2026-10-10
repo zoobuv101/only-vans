@@ -25,7 +25,8 @@ DOMAIN = "only-vans.uk"
 IG = "https://www.instagram.com/tedandlolasonlyvans/"
 LONDON = ZoneInfo("Europe/London")
 HERO = ("18115457765014274", 0)  # both vans, tops up, outside Winchester
-NAV = [("adventures", "index.html#adventures", "Adventures"), ("ig", IG, "Instagram")]
+NAV = [("adventures", "index.html#adventures", "Adventures"), ("map", "index.html#map", "Map"), ("ig", IG, "Instagram")]
+LEAFLET = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/"
 FONTS = ("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700"
          "&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600&family=DM+Mono:wght@400;500&display=swap")
 # Old and current handles of the van account both mean "Ted & Lola" in captions.
@@ -96,7 +97,7 @@ def load_posts() -> list[dict]:
         when = datetime.date.fromisoformat(o["date"]) if dated else local(p["timestamp"]).date()
         end = datetime.date.fromisoformat(o["end"]) if o.get("end") else None
         title = o.get("title") or plain(p["caption"], 60) or "On the road"
-        p.update(title=title, place=o.get("place", ""), vans=o.get("vans", "Ted & Lola"),
+        p.update(title=title, place=o.get("place", ""), at=o.get("at"), vans=o.get("vans", "Ted & Lola"),
                  when=when, end=end, dated=dated, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
                  slug=f"{when:%Y-%m-%d}-{slugify(title)}")
         out.append(p)
@@ -183,6 +184,14 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
             f'<span><time datetime="{p["when"]:%Y-%m-%d}">{where}{span(p["when"], p["end"])}</time>'
             f'<h3>{esc(p["title"])}</h3><p>{esc(plain(p["caption"]))}</p></span></a></li>')
     places = len({p["place"] for p in posts if p["place"]})
+    # one map pin per spot; several adventures at the same spot share a pin
+    pins = {}
+    for p in sorted(posts, key=lambda x: x["when"]):
+        if p["at"]:
+            pins.setdefault(tuple(p["at"]), []).append(p)
+    pin_data = [{"at": list(k), "html": f'<b>{esc(v[0]["place"])}</b>' + "".join(
+        f'<br><a href="adventures/{q["slug"]}.html">{esc(q["title"])}</a> <span>{span(q["when"], q["end"])}</span>' for q in v)}
+        for k, v in pins.items()]
     body = f'''<section class="hero">
   <img src="{hm["src"]}" alt="Lola, the white VW camper with a teal pop-top, and Ted, the grey one, roofs up on a sunny campsite" width="{hm["w"]}" height="{hm["h"]}">
   <div class="hero__text">
@@ -201,6 +210,27 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
     <div><dt>Adventures</dt><dd>{len(posts)}</dd></div>
     <div><dt>Places</dt><dd>{places}</dd></div>
   </dl>
+  <h2 id="map">Where we've been</h2>
+  <link rel="stylesheet" href="{LEAFLET}leaflet.min.css">
+  <div class="map" id="ov-map" role="region" aria-label="Map of everywhere Ted and Lola have been"></div>
+  <script type="application/json" id="ov-pins">{json.dumps(pin_data, ensure_ascii=False).replace("</", "<\\/")}</script>
+  <script src="{LEAFLET}leaflet.min.js"></script>
+  <script>
+  (function () {{
+    if (!window.L) return;
+    var pins = JSON.parse(document.getElementById("ov-pins").textContent);
+    var map = L.map("ov-map", {{ scrollWheelZoom: false }});
+    L.tileLayer("https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
+      maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }}).addTo(map);
+    var teal = getComputedStyle(document.documentElement).getPropertyValue("--teal-bright").trim() || "#36b3aa";
+    pins.forEach(function (p) {{
+      L.circleMarker(p.at, {{ radius: 9, color: "#ffffff", weight: 2, fillColor: teal, fillOpacity: 1 }})
+        .bindPopup(p.html).addTo(map);
+    }});
+    map.fitBounds(pins.map(function (p) {{ return p.at; }}), {{ padding: [30, 30] }});
+  }})();
+  </script>
   <h2 id="adventures">Adventures</h2>
   <ul class="trips">
     {chr(10).join("    " + i for i in items).lstrip()}

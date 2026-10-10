@@ -118,3 +118,11 @@ footer .stripe { margin-bottom: 1.5rem; height: 4px; }
 .hero__credit { position: absolute; right: 16px; bottom: 0.9rem; margin: 0; font: 400 0.68rem/1.4 var(--mono); color: rgb(255 255 255 / 0.75); }
 
 @media (prefers-reduced-motion: no-preference) { .photos a:hover img { transform: scale(1.04); } }
+
+/* map of everywhere: Leaflet + OpenStreetMap tiles, teal pins */
+.map { height: clamp(22rem, 60vh, 34rem); border-radius: 6px; border: 1px solid var(--rule); z-index: 0; background: var(--panel); }
+.map .leaflet-popup-content-wrapper, .map .leaflet-popup-tip { background: var(--panel); color: var(--ink); }
+.map .leaflet-popup-content { font: 400 0.95rem/1.5 var(--body); margin: 0.8rem 1rem; }
+.map .leaflet-popup-content b { font-family: var(--display); font-size: 1.05rem; }
+.map .leaflet-popup-content span { font: 400 0.75rem/1.4 var(--mono); color: var(--dim); }
+.map .leaflet-popup-content a { color: var(--teal); }
