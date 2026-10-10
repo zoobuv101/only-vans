@@ -102,7 +102,7 @@ def load_posts() -> list[dict]:
         when = datetime.date.fromisoformat(o["date"]) if dated else local(p["timestamp"]).date()
         end = datetime.date.fromisoformat(o["end"]) if o.get("end") else None
         title = o.get("title") or plain(p["caption"], 60) or "On the road"
-        p.update(title=title, place=o.get("place", ""), at=o.get("at"), notes=o.get("notes", ""), vans=o.get("vans", "Ted & Lola"),
+        p.update(title=title, place=o.get("place", ""), at=o.get("at"), notes=o.get("notes", ""), when_text=o.get("when_text", ""), vans=o.get("vans", "Ted & Lola"),
                  when=when, end=end, dated=dated, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
                  slug=f"{when:%Y-%m-%d}-{slugify(title)}")
         out.append(p)
@@ -186,7 +186,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
         items.append(
             f'<li><a href="adventures/{p["slug"]}.html">'
             f'<img src="{thumb(p["cover"])}" alt="" loading="lazy" width="{p["cover"]["w"]}" height="{p["cover"]["h"]}">'
-            f'<span><time datetime="{p["when"]:%Y-%m-%d}">{where}{span(p["when"], p["end"])}</time>'
+            f'<span><time datetime="{p["when"]:%Y-%m-%d}">{where}{p["when_text"] or span(p["when"], p["end"])}</time>'
             f'<h3>{esc(p["title"])}</h3><p>{esc(plain(p["caption"]))}</p></span></a></li>')
     places = len({p["place"] for p in posts if p["place"]})
     # trips, not entries: back-to-back campsite stays (Kendal -> Moss Howe) are one trip
@@ -285,13 +285,13 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
                + (f'<a class="next" href="{newer["slug"]}.html"><small>Newer</small>{esc(newer["title"])}</a>' if newer else "")
                + '</nav>')
     body = f'''<main class="page">
-  <p class="eyebrow">{esc(p["place"]) + " · " if p["place"] else ""}{span(p["when"], p["end"], True) if p["dated"] else "Posted " + span(p["when"], None, True)}</p>
+  <p class="eyebrow">{esc(p["place"]) + " · " if p["place"] else ""}{p["when_text"] or (span(p["when"], p["end"], True) if p["dated"] else "Posted " + span(p["when"], None, True))}</p>
   <h1>{esc(p["title"])}</h1>
   <figure class="wide"><img src="{{{{up}}}}{c["src"]}" alt="" width="{c["w"]}" height="{c["h"]}"></figure>
   <dl class="log">
     <div><dt>Where</dt><dd>{esc(p["place"] or "On the road")}</dd></div>
     <div><dt>Vans</dt><dd>{esc(p["vans"])}</dd></div>
-    <div><dt>{"When" if p["dated"] else "Posted"}</dt><dd>{span(p["when"], p["end"])}</dd></div>
+    <div><dt>{"When" if p["dated"] else "Posted"}</dt><dd>{p["when_text"] or span(p["when"], p["end"])}</dd></div>
     <div><dt>Photos</dt><dd>{len(p["media"])}</dd></div>
   </dl>
   {caption_html(p["caption"])}
@@ -301,7 +301,7 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
   {nav}
 </main>'''
     meta = {"title": f'{p["title"]} · Only Vans', "description": plain(p["caption"], 155),
-            "image": c["src"], "date": f'{p["when"]:%Y-%m-%d}'}
+            "image": c["src"], "date": "" if p["when_text"] else f'{p["when"]:%Y-%m-%d}'}
     return meta, body
 
 
