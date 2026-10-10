@@ -1,5 +1,5 @@
 {
  "_note": "Trips not on Instagram. Keys: title, place, vans, date (required) + end, caption (plain text, @handles become links), photos (img/gp/... from scripts/import_photos.py), cover.",
- "gp-2024-11-hartland": {"title": "Lights on at Hartland", "place": "Hartland, North Devon", "vans": "Ted & Lola", "date": "2024-11-08", "photos": ["img/gp/IMG_1010.jpg"]},
- "gp-2025-05-croyde": {"title": "Sunshine at Croyde", "place": "Putsborough, Croyde, North Devon", "vans": "Lola", "date": "2025-05-01", "photos": ["img/gp/IMG_1680.jpg"]}
+ "gp-2024-11-hartland": {"title": "Lights on at Hartland", "place": "Hartland, North Devon", "vans": "Ted & Lola", "date": "2024-11-08", "photos": ["img/gp/IMG_1010.jpg"], "end": "2024-11-10", "caption": "A November weekend away for Ted & Lola. We rolled into Hartland on the Friday evening, got the lights and the windbreak up and settled in for the weekend.\nSaturday and Sunday were all about walks on the beach in the winter sunshine, good food and a few drinks, before heading home on the Sunday 🩶🤍"},
+ "gp-2025-05-croyde": {"title": "Sunshine at Croyde", "place": "Putsborough, Croyde, North Devon", "vans": "Ted & Lola", "date": "2025-05-01", "photos": ["img/gp/IMG_1680.jpg"], "end": "2025-05-04", "caption": "Ted & Lola pitched up side by side at Putsborough for a weekend at Croyde, with the chairs out and the sun shining.\nSunny walks on the beach, good food and a few drinks made for the perfect weekend away 🩶🤍"}
 }
