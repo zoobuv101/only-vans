@@ -314,7 +314,7 @@ def build(preview: bool = False) -> str:
     thumbs(posts, out)
     pages = [("index.html", None, *index_page(posts))]
     for i, p in enumerate(posts):
-        pages.append((f'adventures/{p["slug"]}.html', p["when"].isoformat(),
+        pages.append((f'adventures/{p["slug"]}.html', None if p["when_text"] else p["when"].isoformat(),
                       *post_page(p, posts[i - 1] if i else None, posts[i + 1] if i + 1 < len(posts) else None)))
     for rel, _, meta, body in pages:
         full = not (preview and rel == "index.html")  # the Artifact wraps its own entry page
