@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Only Vans">
+  <!-- Original mark: a bold ring with a tapered tail, mirrored and with the tail turned down. Teal = Lola's pop-top. -->
+  <circle cx="60" cy="46" r="24" fill="none" stroke="#36b3aa" stroke-width="16"/>
+  <path d="M30 58 Q34 74 48 80 Q30 86 6 84 Q22 76 30 58 Z" fill="#1f7f7a"/>
+</svg>
