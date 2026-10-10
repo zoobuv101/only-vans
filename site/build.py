@@ -54,6 +54,18 @@ def plain(text: str, n: int = 150) -> str:
     return t if len(t) <= n else t[:n].rsplit(" ", 1)[0] + "…"
 
 
+def span(start: datetime.date, end: datetime.date | None, long: bool = False) -> str:
+    """'14 Aug 2026', '14–16 Aug 2026', '30 Aug – 2 Sep 2026' (long: full day/month names)."""
+    d, m = ("%A %-d", "%B") if long else ("%-d", "%b")
+    if not end or end == start:
+        return start.strftime(f"{d} {m} %Y")
+    if (start.year, start.month) == (end.year, end.month):
+        return f"{start:%-d}–{end:%-d} " + end.strftime(f"{m} %Y")
+    if start.year == end.year:
+        return f"{start:%-d} " + start.strftime(m) + " – " + end.strftime(f"%-d {m} %Y")
+    return start.strftime(f"%-d {m} %Y") + " – " + end.strftime(f"%-d {m} %Y")
+
+
 def slugify(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower().replace("'", "")).strip("-")[:60]
 
@@ -66,12 +78,16 @@ def load_posts() -> list[dict]:
         o = over.get(p["id"], {})
         if o.get("hide") or not p["media"]:
             continue
-        when = local(p["timestamp"])
+        # Trip dates from overrides win; otherwise fall back to the Instagram posting date.
+        dated = bool(o.get("date"))
+        when = datetime.date.fromisoformat(o["date"]) if dated else local(p["timestamp"]).date()
+        end = datetime.date.fromisoformat(o["end"]) if o.get("end") else None
         title = o.get("title") or plain(p["caption"], 60) or "On the road"
         p.update(title=title, place=o.get("place", ""), vans=o.get("vans", "Ted & Lola"),
-                 when=when, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
+                 when=when, end=end, dated=dated, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
                  slug=f"{when:%Y-%m-%d}-{slugify(title)}")
         out.append(p)
+    out.sort(key=lambda x: (x["when"], x["timestamp"]), reverse=True)
     return out
 
 
@@ -146,7 +162,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
         items.append(
             f'<li><a href="adventures/{p["slug"]}.html">'
             f'<img src="{thumb(p["cover"])}" alt="" loading="lazy" width="{p["cover"]["w"]}" height="{p["cover"]["h"]}">'
-            f'<span><time datetime="{p["when"]:%Y-%m-%d}">{where}{p["when"]:%-d %b %Y}</time>'
+            f'<span><time datetime="{p["when"]:%Y-%m-%d}">{where}{span(p["when"], p["end"])}</time>'
             f'<h3>{esc(p["title"])}</h3><p>{esc(plain(p["caption"]))}</p></span></a></li>')
     places = len({p["place"] for p in posts if p["place"]})
     body = f'''<section class="hero">
@@ -190,13 +206,13 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
                + (f'<a class="next" href="{newer["slug"]}.html"><small>Newer</small>{esc(newer["title"])}</a>' if newer else "")
                + '</nav>')
     body = f'''<main class="page">
-  <p class="eyebrow">{esc(p["place"]) + " · " if p["place"] else ""}{p["when"]:%A %-d %B %Y}</p>
+  <p class="eyebrow">{esc(p["place"]) + " · " if p["place"] else ""}{span(p["when"], p["end"], True) if p["dated"] else "Posted " + span(p["when"], None, True)}</p>
   <h1>{esc(p["title"])}</h1>
   <figure class="wide"><img src="{{{{up}}}}{c["src"]}" alt="" width="{c["w"]}" height="{c["h"]}"></figure>
   <dl class="log">
     <div><dt>Where</dt><dd>{esc(p["place"] or "On the road")}</dd></div>
     <div><dt>Vans</dt><dd>{esc(p["vans"])}</dd></div>
-    <div><dt>Posted</dt><dd>{p["when"]:%-d %b %Y}</dd></div>
+    <div><dt>{"When" if p["dated"] else "Posted"}</dt><dd>{span(p["when"], p["end"])}</dd></div>
     <div><dt>Photos</dt><dd>{len(p["media"])}</dd></div>
   </dl>
   {caption_html(p["caption"])}
@@ -218,7 +234,7 @@ def build(preview: bool = False) -> str:
     thumbs(posts, out)
     pages = [("index.html", None, *index_page(posts))]
     for i, p in enumerate(posts):
-        pages.append((f'adventures/{p["slug"]}.html', p["when"].date().isoformat(),
+        pages.append((f'adventures/{p["slug"]}.html', p["when"].isoformat(),
                       *post_page(p, posts[i - 1] if i else None, posts[i + 1] if i + 1 < len(posts) else None)))
     for rel, _, meta, body in pages:
         full = not (preview and rel == "index.html")  # the Artifact wraps its own entry page

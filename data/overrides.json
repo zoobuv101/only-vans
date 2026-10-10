@@ -1,5 +1,5 @@
 {
- "_note": "Hand-written extras per Instagram post id. Optional keys: title, place, vans, cover (index into media), hide. The sync never touches this file; posts without an entry fall back to their caption.",
+ "_note": "Hand-written extras per Instagram post id. Optional keys: title, place, vans, date + end (trip dates, YYYY-MM-DD; set the order and replace the Instagram posting date), cover (index into media), hide. The sync never touches this file; posts without an entry fall back to their caption.",
  "18106948964248287": {"title": "Coffee, pies and a castle at Sizergh", "place": "Sizergh, Cumbria"},
  "18177789175431137": {"title": "Witherslack, Cartmel and Dragon the cockerel", "place": "Witherslack, Cumbria", "cover": 3},
  "17988168282082501": {"title": "Dining at L'Enclume", "place": "Cartmel, Cumbria", "cover": 7},
