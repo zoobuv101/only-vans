@@ -90,6 +90,8 @@ def load_posts() -> list[dict]:
         o = over.get(p["id"], {})
         # extra photos (not from Instagram) are appended after the post's own
         p["media"] = p["media"] + [photo(src) for src in o.get("extra", [])]
+        if o.get("order"):  # indices into Instagram media + extras, in display order
+            p["media"] = [p["media"][i] for i in o["order"]]
         if o.get("hide") or not p["media"]:
             continue
         # Trip dates from overrides win; otherwise fall back to the Instagram posting date.
