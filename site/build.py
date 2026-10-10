@@ -127,7 +127,7 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
             f'<nav>{nav}</nav></header>\n'
             + ('' if over else '<div class="stripe" aria-hidden="true"></div>\n')
             + body.replace("{{up}}", up) +
-            '\n<footer><span class="stripe" aria-hidden="true"></span>Ted &amp; Lola, two VW campers that like to travel together. '
+            '\n<footer><span class="stripe" aria-hidden="true"></span>Lola (white) and Ted (grey), two VW campers that like to travel together. '
             f'Stories and photos from <a href="{IG}">@tedandlolasonlyvans</a>; site built by Claude.'
             f'<br>© {datetime.date.today().year} only-vans.uk. Photos are ours; please ask before reusing them.</footer>\n')
     if not full:
@@ -150,7 +150,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
             f'<h3>{esc(p["title"])}</h3><p>{esc(plain(p["caption"]))}</p></span></a></li>')
     places = len({p["place"] for p in posts if p["place"]})
     body = f'''<section class="hero">
-  <img src="{hm["src"]}" alt="Ted and Lola, a white and a grey VW camper with their pop-top roofs up, parked on a sunny campsite" width="{hm["w"]}" height="{hm["h"]}">
+  <img src="{hm["src"]}" alt="Lola, the white VW camper with a teal pop-top, and Ted, the grey one, roofs up on a sunny campsite" width="{hm["w"]}" height="{hm["h"]}">
   <div class="hero__text">
     <p class="eyebrow">Two vans · four friends · one road</p>
     <h1>Ted &amp; Lola's adventures</h1>
@@ -160,7 +160,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
   <p class="hero__credit">{esc(hero["place"] or "On the road")} · {hero["when"]:%b %Y}</p>
 </section>
 <main class="page">
-  <p class="lede">Lola belongs to Annette and Ian, Ted to JC and Ceri. More often than not the two vans set off together. This is where their trips are written up, straight from the Instagram feed.</p>
+  <p class="lede">Lola is the white van with the teal roof and belongs to Annette and Ian. Ted is the grey one and belongs to JC and Ceri. More often than not the two vans set off together. This is where their trips are written up, straight from the Instagram feed.</p>
   <dl class="log">
     <div><dt>Vans</dt><dd>Ted &amp; Lola</dd></div>
     <div><dt>Crew</dt><dd>Annette, Ian, JC, Ceri</dd></div>
