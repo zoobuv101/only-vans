@@ -159,11 +159,11 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             f'<link rel="stylesheet" href="{FONTS}">\n'
             f'<link rel="stylesheet" href="{up}assets/style.css">\n'
-            f'<link rel="icon" href="{up}assets/logo.svg" type="image/svg+xml">\n'
+            f'<link rel="icon" href="{up}assets/favicon.png" type="image/png">\n'
             '<meta name="theme-color" content="#f6f4ef">\n')
     over = " bar--over" if meta.get("hero") else ""
     nav = "".join(f'<a href="{href if href.startswith("http") else up + href}">{label}</a>' for _, href, label in NAV)
-    page = (f'<header class="bar{over}"><a class="brand" href="{up}index.html"><img src="{up}assets/logo.svg" alt="" width="67" height="67">Only <span>Vans</span></a>\n'
+    page = (f'<header class="bar{over}"><a class="brand" href="{up}index.html"><img src="{up}assets/logo-192.png" alt="" width="67" height="67">Only <span>Vans</span></a>\n'
             f'<nav>{nav}</nav></header>\n'
             + ('' if over else '<div class="stripe" aria-hidden="true"></div>\n')
             + body.replace("{{up}}", up) +
