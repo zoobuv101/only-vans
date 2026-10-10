@@ -1,11 +1,11 @@
 {
  "_note": "Hand-written extras per Instagram post id. Optional keys: title, place, vans, date + end (trip dates, YYYY-MM-DD; set the order and replace the Instagram posting date), cover (index into media), extra (list of img/gp/... photos added after the Instagram ones), hide. The sync never touches this file; posts without an entry fall back to their caption.",
  "18106948964248287": {"title": "Coffee, pies and a castle at Sizergh", "place": "Sizergh, Lake District", "date": "2026-09-18", "end": "2026-09-25"},
- "18177789175431137": {"title": "Witherslack, Cartmel and Dragon the cockerel", "place": "Witherslack, Lake District", "cover": 3, "date": "2026-09-18", "end": "2026-09-25", "extra": ["img/gp/IMG_3213.jpg", "img/gp/IMG_3215.jpg"]},
- "17988168282082501": {"title": "Dining at L'Enclume", "place": "Cartmel, Lake District", "cover": 7, "date": "2026-09-24"},
+ "18177789175431137": {"title": "Witherslack, Cartmel and Dragon the cockerel", "place": "Witherslack, Lake District", "cover": 3, "date": "2026-09-18", "end": "2026-09-25", "extra": ["img/gp/IMG_3213.jpg", "img/gp/IMG_3215.jpg", "img/gp/IMG_3216.jpg", "img/gp/IMG_3237.jpg"]},
+ "17988168282082501": {"title": "Dining at L'Enclume", "place": "Cartmel, Lake District", "cover": 7, "date": "2026-09-24", "extra": ["img/gp/lenclume-1.jpg", "img/gp/lenclume-2.jpg"]},
  "17866790721659177": {"title": "Another day, another stop", "place": "Grange-over-Sands, Lake District", "date": "2026-09-23"},
  "18040842329831763": {"title": "Ted & Lola on adjacent pitches", "place": "Lynmouth Holiday Retreat, Devon", "date": "2026-05-29", "end": "2026-05-31", "extra": ["img/gp/IMG_2134.jpg"]},
  "18115457765014274": {"title": "This is how we roll: sunshine outside Winchester", "place": "Folly Farm Caravan & Campsite, Winchester", "date": "2026-07-17", "end": "2026-07-19", "extra": ["img/gp/IMG_2731.jpg", "img/gp/IMG_2734.jpg"]},
  "17962828182197134": {"title": "Stockbridge on the way home", "place": "Stockbridge, Hampshire", "date": "2026-07-19"},
- "17935381866373331": {"title": "An overcast Windermere", "place": "Windermere, Lake District", "date": "2026-09-21"}
+ "17935381866373331": {"title": "An overcast Windermere", "place": "Windermere, Lake District", "date": "2026-09-21", "extra": ["img/gp/IMG_3195.jpg", "img/gp/IMG_3198.jpg", "img/gp/IMG_3201.jpg"]}
 }

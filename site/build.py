@@ -44,7 +44,9 @@ def caption_html(text: str) -> str:
         url = IG if h in OWN else f"https://www.instagram.com/{h}/"
         return f'<a href="{url}">@{esc(h)}</a>'
     paras = [p.strip() for p in text.split("\n") if p.strip()]
-    return "\n".join("<p>" + re.sub(r"@([A-Za-z0-9_.]+)", handle, esc(p)) + "</p>" for p in paras)
+    url = lambda m: f'<a href="{m.group(0)}">{m.group(0).split("//", 1)[1].rstrip("/")}</a>'  # noqa: E731
+    link = lambda t: re.sub(r"https?://[^\s<]+", url, t) if "://" in t else re.sub(r"@([A-Za-z0-9_.]+)", handle, t)  # noqa: E731
+    return "\n".join("<p>" + link(esc(p)) + "</p>" for p in paras)
 
 
 def plain(text: str, n: int = 150) -> str:
