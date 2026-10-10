@@ -1,11 +1,11 @@
 {
  "_note": "Hand-written extras per Instagram post id. Optional keys: title, place, vans, date + end (trip dates, YYYY-MM-DD; set the order and replace the Instagram posting date), cover (index into media), hide. The sync never touches this file; posts without an entry fall back to their caption.",
- "18106948964248287": {"title": "Coffee, pies and a castle at Sizergh", "place": "Sizergh, Cumbria"},
- "18177789175431137": {"title": "Witherslack, Cartmel and Dragon the cockerel", "place": "Witherslack, Cumbria", "cover": 3},
- "17988168282082501": {"title": "Dining at L'Enclume", "place": "Cartmel, Cumbria", "cover": 7},
+ "18106948964248287": {"title": "Coffee, pies and a castle at Sizergh", "place": "Sizergh, Lake District", "date": "2026-09-18", "end": "2026-09-25"},
+ "18177789175431137": {"title": "Witherslack, Cartmel and Dragon the cockerel", "place": "Witherslack, Lake District", "cover": 3, "date": "2026-09-18", "end": "2026-09-25"},
+ "17988168282082501": {"title": "Dining at L'Enclume", "place": "Cartmel, Lake District", "cover": 7, "date": "2026-09-24"},
  "17866790721659177": {"title": "Another day, another stop"},
  "18040842329831763": {"title": "Ted & Lola on adjacent pitches", "place": "Lynmouth Holiday Retreat, Devon"},
- "18115457765014274": {"title": "This is how we roll: sunshine outside Winchester", "place": "Winchester, Hampshire"},
- "17962828182197134": {"title": "Stockbridge on the way home", "place": "Stockbridge, Hampshire"},
- "17935381866373331": {"title": "An overcast Windermere", "place": "Windermere, Cumbria"}
+ "18115457765014274": {"title": "This is how we roll: sunshine outside Winchester", "place": "Winchester, Hampshire", "date": "2026-07-17", "end": "2026-07-19"},
+ "17962828182197134": {"title": "Stockbridge on the way home", "place": "Stockbridge, Hampshire", "date": "2026-07-17", "end": "2026-07-19"},
+ "17935381866373331": {"title": "An overcast Windermere", "place": "Windermere, Lake District", "date": "2026-09-18", "end": "2026-09-25"}
 }
