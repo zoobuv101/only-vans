@@ -1,0 +1,117 @@
+/* only-vans — Ted & Lola's adventure log.
+   Layout follows uv101.uk: full-bleed hero, one reading column (~68ch), mono "log strips".
+   Colour comes from the vans: Lola-white and Ted-grey bodywork, the teal of a pop-top roof. */
+:root {
+  --paper: #f6f4ef;       /* chalky off-white, like the white van */
+  --panel: #ffffff;
+  --rule: #dedad0;
+  --ink: #22272c;         /* near-black slate */
+  --dim: #646b72;         /* the grey van */
+  --teal: #1f7f7a;        /* pop-top canvas, darkened for text contrast */
+  --teal-bright: #36b3aa;
+  --sun: #d98a2b;         /* campsite-evening amber, used sparingly */
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure: 68ch;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15181b; --panel: #1d2125; --rule: #2d3338; --ink: #ebe8e1; --dim: #a1a8ae;
+    --teal: #4cc3b9; --teal-bright: #4cc3b9; --sun: #e9a14a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15181b; --panel: #1d2125; --rule: #2d3338; --ink: #ebe8e1; --dim: #a1a8ae;
+  --teal: #4cc3b9; --teal-bright: #4cc3b9; --sun: #e9a14a; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1.0625rem/1.7 var(--body); padding-inline: 16px; }
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--teal); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--ink); }
+a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 2px; }
+
+/* site bar */
+.bar { max-width: 72rem; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem;
+  align-items: baseline; justify-content: space-between; padding-block: 1.1rem; }
+.brand { font: 700 1.3rem/1 var(--display); color: var(--ink); text-decoration: none; white-space: nowrap; }
+.brand span { color: var(--teal); }
+.bar nav { display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; font: 500 0.78rem/1 var(--mono); text-transform: uppercase; letter-spacing: 0.12em; }
+.bar nav a { color: var(--dim); text-decoration: none; }
+.bar nav a:hover { color: var(--ink); }
+
+/* the body stripe: grey, white and teal, like a van's side trim */
+.stripe { display: block; max-width: 72rem; margin: 0 auto; height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--dim) 0 46%, var(--rule) 46% 54%, var(--teal-bright) 54% 100%); }
+
+/* headings */
+h1, h2, h3 { font-family: var(--display); line-height: 1.2; text-wrap: balance; margin: 0; overflow-wrap: break-word; }
+h1 { font-size: clamp(1.8rem, 4.6vw + 0.4rem, 3.2rem); font-weight: 700; }
+h2 { font-size: clamp(1.4rem, 2.6vw + 0.4rem, 1.9rem); font-weight: 600; margin-top: 2.5rem; }
+h3 { font-size: 1.2rem; font-weight: 600; }
+.eyebrow { font: 500 0.75rem/1.4 var(--mono); text-transform: uppercase; letter-spacing: 0.14em; color: var(--teal); }
+
+/* reading column */
+.page { max-width: var(--measure); margin: 0 auto; padding-block: 2.5rem 5rem; display: flex; flex-direction: column; gap: 1.1rem; }
+.page > * { margin: 0; }
+.lede { font-size: 1.2rem; line-height: 1.6; }
+
+/* log strip */
+.log { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; font-family: var(--mono); margin: 0; }
+.log div { background: var(--panel); padding: 0.7rem 0.85rem; display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.log dt { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dim); }
+.log dd { margin: 0; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+
+/* figures */
+figure { margin: 0; }
+figure.wide { width: min(64rem, calc(100vw - 32px)); margin-inline: calc((min(64rem, calc(100vw - 32px)) - 100%) / -2); }
+figure.wide img { width: auto; max-width: 100%; max-height: min(44rem, 80vh); margin-inline: auto; border-radius: 6px; }
+.photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.6rem; }
+.photos a { display: block; border-radius: 5px; overflow: hidden; aspect-ratio: 1; }
+.photos img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+
+/* adventure list */
+.trips { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
+.trips li { border-bottom: 1px solid var(--rule); }
+.trips a { display: grid; grid-template-columns: 9rem 1fr; gap: 1.1rem; padding-block: 1.1rem; text-decoration: none; color: var(--ink); align-items: start; }
+.trips img { width: 9rem; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 5px; }
+.trips span { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.trips time { font: 400 0.75rem/1.5 var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; }
+.trips p { margin: 0; color: var(--dim); font-size: 0.97rem; }
+.trips a:hover h3 { color: var(--teal); }
+@media (max-width: 30rem) { .trips a { grid-template-columns: 6rem 1fr; gap: 0.8rem; } .trips img { width: 6rem; } .trips p { display: none; } }
+
+/* older / newer */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; margin-top: 1rem; }
+.pager a { text-decoration: none; font: 600 1rem/1.35 var(--display); color: var(--ink); display: flex; flex-direction: column; gap: 0.3rem; }
+.pager a.next { text-align: right; }
+.pager small { font: 500 0.7rem/1 var(--mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--teal); }
+
+footer { max-width: 72rem; margin: 0 auto; padding-block: 0 2.5rem; font: 400 0.75rem/1.7 var(--mono); color: var(--dim); }
+footer .stripe { margin-bottom: 1.5rem; height: 4px; }
+
+/* front page hero: title over the photo, header floats on top (text stays light on the dark gradient in both themes) */
+.bar--over { position: absolute; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 2; padding-inline: 16px; max-width: none; }
+.bar--over .brand, .bar--over nav a { color: #fff; text-shadow: 0 1px 8px rgb(0 0 0 / 0.6); }
+.bar--over .brand span { color: #8fe3da; }
+.hero { position: relative; margin-inline: -16px; min-height: min(88vh, 52rem); display: grid; align-items: end; overflow: hidden; isolation: isolate; }
+.hero > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 55%; z-index: -2; }
+.hero::after { content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(to top, rgb(16 20 24 / 0.88) 0%, rgb(16 20 24 / 0.55) 30%, rgb(16 20 24 / 0) 60%, rgb(16 20 24 / 0.35) 100%); }
+.hero__text { max-width: 72rem; width: 100%; margin: 0 auto; padding: 6rem 16px 3.5rem; display: flex; flex-direction: column; gap: 0.9rem; color: #fff; }
+.hero__text > * { margin: 0; max-width: 40rem; }
+.hero .eyebrow { color: #8fe3da; }
+.hero h1 { font-size: clamp(2.3rem, 7vw, 5rem); line-height: 1.08; text-shadow: 0 2px 24px rgb(0 0 0 / 0.5); }
+.hero__text > p:not(.eyebrow) { font-size: 1.15rem; line-height: 1.55; text-shadow: 0 1px 10px rgb(0 0 0 / 0.7); }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.4rem; }
+.hero__cta a { font: 500 0.82rem/1 var(--mono); text-transform: uppercase; letter-spacing: 0.1em; text-decoration: none;
+  padding: 0.85rem 1.2rem; border-radius: 999px; border: 1px solid #fff; color: #fff; background: rgb(0 0 0 / 0.25); }
+.hero__cta a:first-child { background: #36b3aa; border-color: #36b3aa; color: #0f1a19; }
+.hero__cta a:hover { border-color: #8fe3da; }
+.hero__credit { position: absolute; right: 16px; bottom: 0.9rem; margin: 0; font: 400 0.68rem/1.4 var(--mono); color: rgb(255 255 255 / 0.75); }
+
+@media (prefers-reduced-motion: no-preference) { .photos a:hover img { transform: scale(1.04); } }

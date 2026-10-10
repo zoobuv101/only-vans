@@ -1,0 +1,12 @@
+# secrets — never commit
+.env
+*.env
+.ig-session*
+# local tooling / raw pulls
+.venv/
+data/raw/
+# build output (deployed by Actions, not committed)
+site/public/
+site/preview/
+# local working notes — kept out of the public repo
+CLAUDE.md

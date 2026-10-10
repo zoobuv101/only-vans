@@ -1,0 +1,31 @@
+name: Renew Instagram token
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 5 * * 1"   # Mondays 05:23 UTC (06:23 BST / 05:23 GMT)
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A failed run emails the repo owner — that is the expiry alert.
+      - name: Refresh token and store it back as the IG_TOKEN secret
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_SECRETS_PAT }}   # fine-grained PAT, this repo, Secrets: write
+        run: python3 scripts/refresh_token.py --gh-secret
+
+      # Weekly commit also keeps the repo "active" so GitHub doesn't auto-disable the schedule.
+      - name: Commit token status
+        run: |
+          git config user.name "token-refresh-bot"
+          git config user.email "actions@github.com"
+          git add data/token-status.json
+          git commit -m "Token renewed $(date -u +%F)" || echo "No changes."
+          git push
