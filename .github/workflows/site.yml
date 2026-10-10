@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install pillow
+      - run: pip install pillow pillow-heif
 
       # A failed sync (e.g. expired token) fails the run, and GitHub emails the repo owner.
       - name: Pull new Instagram posts

@@ -73,9 +73,20 @@ def slugify(s: str) -> str:
 def load_posts() -> list[dict]:
     posts = json.load(open(os.path.join(ROOT, "data", "posts.json")))
     over = json.load(open(os.path.join(ROOT, "data", "overrides.json")))
+    # Trips that never went on Instagram (photos from Google Photos etc.), same keys as overrides
+    # plus "caption" and "photos"; their date is required since there is no posting date.
+    manual = json.load(open(os.path.join(ROOT, "data", "manual.json")))
+    for mid, m in manual.items():
+        if mid.startswith("_"):
+            continue
+        posts.append({"id": mid, "timestamp": f'{m["date"]}T12:00:00+0000', "permalink": "",
+                      "caption": m.get("caption", ""), "media": []})
+        over[mid] = {**m, "extra": m.get("photos", [])}
     out = []
     for p in posts:
         o = over.get(p["id"], {})
+        # extra photos (not from Instagram) are appended after the post's own
+        p["media"] = p["media"] + [photo(src) for src in o.get("extra", [])]
         if o.get("hide") or not p["media"]:
             continue
         # Trip dates from overrides win; otherwise fall back to the Instagram posting date.
@@ -89,6 +100,11 @@ def load_posts() -> list[dict]:
         out.append(p)
     out.sort(key=lambda x: (x["when"], x["timestamp"]), reverse=True)
     return out
+
+
+def photo(src: str) -> dict:
+    w, h = Image.open(os.path.join(SITE, src)).size
+    return {"src": src, "w": w, "h": h, "video": False}
 
 
 def thumbs(posts: list[dict], out: str) -> None:
@@ -217,7 +233,7 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
   </dl>
   {caption_html(p["caption"])}
   {'<div class="photos">' + chr(10) + figs + chr(10) + '  </div>' if len(p["media"]) > 1 else ""}
-  <p><a href="{p["permalink"]}">See this post on Instagram</a></p>
+  {f'<p><a href="{p["permalink"]}">See this post on Instagram</a></p>' if p["permalink"] else ""}
   {nav}
 </main>'''
     meta = {"title": f'{p["title"]} · Only Vans', "description": plain(p["caption"], 155),
