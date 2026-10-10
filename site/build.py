@@ -53,10 +53,22 @@ def caption_html(text: str) -> str:
     return "\n".join("<p>" + link(esc(p)) + "</p>" for p in paras)
 
 
+HANDLES = {k: v for k, v in json.load(open(os.path.join(ROOT, "data", "handles.json"))).items() if not k.startswith("_")}
+
+
 def plain(text: str, n: int = 150) -> str:
-    t = re.sub(r"@[A-Za-z0-9_.]+", "", text)
-    t = re.sub(r"[^\w\s.,!?'’&()-]", "", t)
-    t = re.sub(r"\s+", " ", t).strip(" .,")
+    """Caption as readable plain text for summaries: our own handle -> "Ted & Lola", known handles ->
+    names (data/handles.json), the trailing list of tagged people dropped, emoji removed."""
+    t = re.sub(r"[^\w\s.,!?'’&()@-]", " ", text)
+    t = re.sub(r"\s+", " ", t).strip()
+    while True:  # drop the tag list at the end (but never our own handle)
+        m = re.search(r"\s*@([A-Za-z0-9_.]+?)\.?$", t)
+        if not m or m.group(1) in OWN:
+            break
+        t = t[:m.start()].rstrip()
+    t = re.sub(r"@(?:%s) custodians" % "|".join(OWN), "Ted & Lola's custodians", t)
+    t = re.sub(r"@([A-Za-z0-9_.]*[A-Za-z0-9_])", lambda m: "Ted & Lola" if m.group(1) in OWN else HANDLES.get(m.group(1), m.group(0)), t)
+    t = re.sub(r"\s+([.,!?])", r"\1", t).strip(" .,")
     return t if len(t) <= n else t[:n].rsplit(" ", 1)[0] + "…"
 
 
@@ -298,6 +310,7 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
   {caption_html(p["notes"])}
   {'<div class="photos">' + chr(10) + figs + chr(10) + '  </div>' if len(p["media"]) > 1 else ""}
   {f'<p><a href="{p["permalink"]}">See this post on Instagram</a></p>' if p["permalink"] else ""}
+  <script src="{{{{up}}}}assets/lightbox.js" defer></script>
   {nav}
 </main>'''
     meta = {"title": f'{p["title"]} · Only Vans', "description": plain(p["caption"], 155),
