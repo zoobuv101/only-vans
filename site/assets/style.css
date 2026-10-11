@@ -133,7 +133,7 @@ footer .stripe { margin-bottom: 1.5rem; height: 4px; }
 .lb[hidden] { display: none; }
 /* Centred on the screen exactly like the ‹ › arrows (top 50% + translate) */
 .lb__img { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  max-width: min(calc(100vw - 32px), 75vw); max-height: 62vh; max-height: 62dvh;
+  max-width: min(90vw, calc(100vw - 8rem)); max-height: min(85vh, calc(100vh - 8rem)); max-height: min(85dvh, calc(100dvh - 8rem));
   object-fit: contain; border-radius: 4px; user-select: none; }
 .lb__btn { position: absolute; border: 0; background: rgb(255 255 255 / 0.12); color: #fff; cursor: pointer;
   width: 3rem; height: 3rem; border-radius: 999px; font: 400 2rem/1 var(--body); display: grid; place-items: center; }
