@@ -171,6 +171,8 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             f'<link rel="stylesheet" href="{FONTS}">\n'
             f'<link rel="stylesheet" href="{up}assets/style.css">\n'
+            '<script>if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("rv");setTimeout(function(){if(!window.__rv)document.documentElement.classList.remove("rv")},2500)}</script>\n'
+            f'<script src="{up}assets/reveal.js" defer></script>\n'
             f'<link rel="icon" href="{up}assets/favicon.png" type="image/png">\n'
             '<meta name="theme-color" content="#f6f4ef">\n')
     over = " bar--over" if meta.get("hero") else ""

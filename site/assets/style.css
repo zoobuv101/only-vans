@@ -144,3 +144,9 @@ footer .stripe { margin-bottom: 1.5rem; height: 4px; }
 .lb__count { position: absolute; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem); margin: 0;
   text-align: center; font: 400 0.8rem/1 var(--mono); color: rgb(255 255 255 / 0.75); }
 @media (max-width: 30rem) { .lb__prev, .lb__next { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 0.4rem); transform: none; } }
+
+/* Scroll reveal (assets/reveal.js) */
+.rv .rv-el { opacity: 0; transform: translateY(1.5rem); transition: opacity .65s ease, transform .65s ease; }
+.rv .rv-el.rv-in { opacity: 1; transform: none; }
+.rv .hero__text > *:not(.rv-el), .rv main.page > *:not(.trips):not(.photos):not(.rv-el),
+.rv .trips > li:not(.rv-el), .rv .photos > a:not(.rv-el) { opacity: 0; transform: translateY(1.5rem); }
