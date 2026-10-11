@@ -129,8 +129,8 @@ footer .stripe { margin-bottom: 1.5rem; height: 4px; }
 .map .leaflet-popup-content a { color: var(--teal); }
 
 /* lightbox: full-size photo viewer with arrows, swipe and keyboard (assets/lightbox.js) */
-.lb { position: fixed; inset: 0; z-index: 1000; background: rgb(10 12 14 / 0.94); display: grid; place-items: center;
-  padding: calc(env(safe-area-inset-top, 0px) + 3.75rem) 16px calc(env(safe-area-inset-bottom, 0px) + 3.5rem); }
+.lb { position: fixed; inset: 0; z-index: 1000; background: rgb(10 12 14 / 0.94); display: grid; place-items: start center;
+  padding: calc(env(safe-area-inset-top, 0px) + max(3.75rem, 12vh)) 16px calc(env(safe-area-inset-bottom, 0px) + 3.5rem); }
 .lb[hidden] { display: none; }
 .lb__img { max-width: min(100%, 75vw); max-height: min(100%, 62vh); max-height: min(100%, 62dvh); object-fit: contain; border-radius: 4px; user-select: none; }
 .lb__btn { position: absolute; border: 0; background: rgb(255 255 255 / 0.12); color: #fff; cursor: pointer;
