@@ -344,6 +344,8 @@ def build(preview: bool = False) -> str:
             + urls + '</urlset>\n')
         open(os.path.join(out, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: https://{DOMAIN}/sitemap.xml\n")
         open(os.path.join(out, ".nojekyll"), "w").write("")
+        # Google Search Console ownership check (URL-prefix property) — must stay served
+        open(os.path.join(out, "google2ee47459a7d5a626.html"), "w").write("google-site-verification: google2ee47459a7d5a626.html")
     return out
 
 
