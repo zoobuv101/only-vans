@@ -379,6 +379,8 @@ def build(preview: bool = False) -> str:
         open(os.path.join(out, "404.html"), "w").write(nf)
         # Google Search Console ownership check (URL-prefix property) — must stay served
         open(os.path.join(out, "google2ee47459a7d5a626.html"), "w").write("google-site-verification: google2ee47459a7d5a626.html")
+        # IndexNow key (scripts/notify_search.py) — public by design, proves pings come from this site
+        open(os.path.join(out, "74d12d053bbb34955d8daa58745a2128.txt"), "w").write("74d12d053bbb34955d8daa58745a2128")
     return out
 
 

@@ -45,8 +45,16 @@ jobs:
       - name: Build site
         run: python3 site/build.py
 
+      - name: Find pages that changed (for search engines)
+        continue-on-error: true
+        run: python3 scripts/notify_search.py diff
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/public
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      - name: Tell search engines (IndexNow)
+        continue-on-error: true
+        run: python3 scripts/notify_search.py send
