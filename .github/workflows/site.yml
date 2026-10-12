@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install pillow pillow-heif
+      - run: pip install pillow pillow-heif google-auth requests
 
       # A failed sync (e.g. expired token) fails the run, and GitHub emails the repo owner.
       - name: Pull new Instagram posts
@@ -57,4 +57,6 @@ jobs:
 
       - name: Tell search engines (IndexNow)
         continue-on-error: true
+        env:
+          GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
         run: python3 scripts/notify_search.py send
