@@ -151,12 +151,17 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
     img = f'https://{DOMAIN}/{meta["image"]}' if meta.get("image") else ""
     article = bool(meta.get("date"))
     ld = {"@context": "https://schema.org", "@type": "BlogPosting" if article else "WebPage",
-          "headline" if article else "name": meta["title"], "description": meta.get("description", ""), "url": url}
+          "headline" if article else "name": meta.get("headline", meta["title"]), "description": meta.get("description", ""), "url": url}
     if img:
         ld["image"] = img
     if article:
-        ld["datePublished"] = meta["date"]
+        site = {"@type": "Organization", "name": "Only Vans", "url": f"https://{DOMAIN}/"}
+        ld.update(datePublished=meta["date"], author=site, publisher=site)
+    if rel == "index.html":  # lets Google show "Only Vans" as the site name in results
+        ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": "Only Vans",
+               "alternateName": ["only-vans.uk", "Ted & Lola's Only Vans"], "url": f"https://{DOMAIN}/"}, ld]
     head = (f'<title>{title}</title>\n'
+            + ('<meta name="robots" content="noindex">\n' if meta.get("noindex") else "") +
             f'<link rel="canonical" href="{url}">\n'
             f'<meta name="description" content="{desc}">\n'
             f'<meta property="og:type" content="{"article" if article else "website"}">\n'
@@ -199,7 +204,7 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
         where = f'{esc(p["place"])} · ' if p["place"] else ""
         items.append(
             f'<li><a href="adventures/{p["slug"]}.html">'
-            f'<img src="{thumb(p["cover"])}" alt="" loading="lazy" width="{p["cover"]["w"]}" height="{p["cover"]["h"]}">'
+            f'<img src="{thumb(p["cover"])}" alt="{esc(alt(p))}" loading="lazy" width="{p["cover"]["w"]}" height="{p["cover"]["h"]}">'
             f'<span><time datetime="{p["when"]:%Y-%m-%d}">{where}{p["when_text"] or span(p["when"], p["end"])}</time>'
             f'<h3>{esc(p["title"])}</h3><p>{esc(plain(p["caption"]))}</p></span></a></li>')
     places = len({p["place"] for p in posts if p["place"]})
@@ -281,10 +286,25 @@ def index_page(posts: list[dict]) -> tuple[dict, str]:
     {chr(10).join("    " + i for i in items).lstrip()}
   </ul>
 </main>'''
-    meta = {"title": "Ted & Lola's Adventures",
-            "description": "Two VW camper vans, Ted and Lola, and the trips they take together around the UK.",
+    meta = {"title": "Only Vans · Ted & Lola's VW camper van adventures",
+            "description": "Two VW camper vans, Ted and Lola, and their trips around the UK: campsites, pubs "
+                           "and photos from Devon, Snowdonia, Dorset, Hampshire and the Lake District.",
             "image": hm["src"], "hero": True}
     return meta, body
+
+
+def alt(p: dict) -> str:
+    return p["title"] + (f', {p["place"]}' if p["place"] else "")
+
+
+def seo_place(p: dict) -> str:
+    """Place words for the <title> that the title doesn't already say: 'Dining at L'Enclume' +
+    'Cartmel, Lake District'; campsite names stay (people search for them), at most two parts."""
+    said = {w.strip("',.").lower() for w in p["title"].split()}
+    parts = [x.strip().removeprefix("near ") for x in p["place"].split(",") if x.strip()]
+    parts = [x for x in parts if not ({w.lower() for w in x.split() if len(w) > 3} & said)]
+    keep = ", ".join(parts[-2:])
+    return keep if len(keep) <= 35 else (parts[-1] if parts else "")
 
 
 def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, str]:
@@ -301,7 +321,7 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
     body = f'''<main class="page">
   <p class="eyebrow">{esc(p["place"]) + " · " if p["place"] else ""}{p["when_text"] or (span(p["when"], p["end"], True) if p["dated"] else "Posted " + span(p["when"], None, True))}</p>
   <h1>{esc(p["title"])}</h1>
-  <figure class="wide"><img src="{{{{up}}}}{c["src"]}" alt="" width="{c["w"]}" height="{c["h"]}"></figure>
+  <figure class="wide"><img src="{{{{up}}}}{c["src"]}" alt="{esc(alt(p))}" width="{c["w"]}" height="{c["h"]}"></figure>
   <dl class="log">
     <div><dt>Where</dt><dd>{esc(p["place"] or "On the road")}</dd></div>
     <div><dt>Vans</dt><dd>{esc(p["vans"])}</dd></div>
@@ -315,8 +335,10 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
   <script src="{{{{up}}}}assets/lightbox.js" defer></script>
   {nav}
 </main>'''
-    meta = {"title": f'{p["title"]} · Only Vans', "description": plain(p["caption"], 155),
-            "image": c["src"], "date": "" if p["when_text"] else f'{p["when"]:%Y-%m-%d}'}
+    where = seo_place(p)
+    meta = {"title": f'{p["title"]}{", " + where if where else ""} · Only Vans', "headline": p["title"],
+            "description": plain(p["caption"], 155), "image": c["src"],
+            "date": "" if p["when_text"] else f'{p["when"]:%Y-%m-%d}', "noindex": bool(p["when_text"])}
     return meta, body
 
 
@@ -338,14 +360,21 @@ def build(preview: bool = False) -> str:
         open(dst, "w").write(layout(body, meta, rel.count("/"), full, rel))
     if not preview:
         open(os.path.join(out, "CNAME"), "w").write(DOMAIN + "\n")
-        today = datetime.date.today().isoformat()
-        urls = "".join(f"  <url><loc>https://{DOMAIN}/{'' if r == 'index.html' else r}</loc><lastmod>{d or today}</lastmod></url>\n"
-                       for r, d, *_ in pages)
+        newest = max(d for _, d, *_ in pages if d)  # the front page changes when a post arrives
+        urls = "".join(f"  <url><loc>https://{DOMAIN}/{'' if r == 'index.html' else r}</loc><lastmod>{d or newest}</lastmod></url>\n"
+                       for r, d, m, _ in pages if not m.get("noindex"))
         open(os.path.join(out, "sitemap.xml"), "w").write(
             '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
             + urls + '</urlset>\n')
         open(os.path.join(out, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: https://{DOMAIN}/sitemap.xml\n")
         open(os.path.join(out, ".nojekyll"), "w").write("")
+        nf = layout('<main class="page">\n  <p class="eyebrow">Error 404</p>\n  <h1>Wrong turning</h1>\n'
+                    '  <p>This page has gone off-grid. Head back to <a href="index.html#adventures">all the adventures</a>'
+                    ' or the <a href="index.html#map">map of everywhere Ted &amp; Lola have been</a>.</p>\n</main>',
+                    {"title": "Page not found · Only Vans", "noindex": True}, 0, True, "404.html")
+        for a in ('href="', 'src="'):
+            nf = re.sub(a + r'(?!https?:|#|/)', a + "/", nf)
+        open(os.path.join(out, "404.html"), "w").write(nf)
         # Google Search Console ownership check (URL-prefix property) — must stay served
         open(os.path.join(out, "google2ee47459a7d5a626.html"), "w").write("google-site-verification: google2ee47459a7d5a626.html")
     return out
