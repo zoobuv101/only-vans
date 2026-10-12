@@ -114,7 +114,7 @@ def load_posts() -> list[dict]:
         when = datetime.date.fromisoformat(o["date"]) if dated else local(p["timestamp"]).date()
         end = datetime.date.fromisoformat(o["end"]) if o.get("end") else None
         title = o.get("title") or plain(p["caption"], 60) or "On the road"
-        p.update(title=title, place=o.get("place", ""), at=o.get("at"), notes=o.get("notes", ""), when_text=o.get("when_text", ""), vans=o.get("vans", "Ted & Lola"),
+        p.update(title=title, place=o.get("place", ""), seo_place=o.get("seo_place", ""), at=o.get("at"), notes=o.get("notes", ""), when_text=o.get("when_text", ""), vans=o.get("vans", "Ted & Lola"),
                  when=when, end=end, dated=dated, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
                  slug=f"{when:%Y-%m-%d}-{slugify(title)}")
         out.append(p)
@@ -300,6 +300,8 @@ def alt(p: dict) -> str:
 def seo_place(p: dict) -> str:
     """Place words for the <title> that the title doesn't already say: 'Dining at L'Enclume' +
     'Cartmel, Lake District'; campsite names stay (people search for them), at most two parts."""
+    if p["seo_place"]:  # hand-picked in overrides.json / manual.json
+        return p["seo_place"]
     said = {w.strip("',.").lower() for w in p["title"].split()}
     parts = [x.strip().removeprefix("near ") for x in p["place"].split(",") if x.strip()]
     parts = [x for x in parts if not ({w.lower() for w in x.split() if len(w) > 3} & said)]
