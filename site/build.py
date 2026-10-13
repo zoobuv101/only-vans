@@ -144,6 +144,13 @@ def thumb(m: dict) -> str:
     return "img/thumb/" + os.path.basename(m["src"])
 
 
+def ver(name: str) -> str:
+    """Content hash for cache-busting: a page always asks for the CSS/JS it was built with
+    (GitHub Pages lets browsers cache assets for 10 minutes)."""
+    import hashlib
+    return hashlib.sha1(open(os.path.join(SITE, "assets", name), "rb").read()).hexdigest()[:8]
+
+
 def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "index.html") -> str:
     up = "../" * depth
     url = f"https://{DOMAIN}/" + ("" if rel == "index.html" else rel)
@@ -175,9 +182,9 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
             + '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             f'<link rel="stylesheet" href="{FONTS}">\n'
-            f'<link rel="stylesheet" href="{up}assets/style.css">\n'
+            f'<link rel="stylesheet" href="{up}assets/style.css?v={ver("style.css")}">\n'
             '<script>if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("rv");setTimeout(function(){if(!window.__rv)document.documentElement.classList.remove("rv")},2500)}</script>\n'
-            f'<script src="{up}assets/reveal.js" defer></script>\n'
+            f'<script src="{up}assets/reveal.js?v={ver("reveal.js")}" defer></script>\n'
             f'<link rel="icon" href="{up}assets/favicon.png" type="image/png">\n'
             '<meta name="theme-color" content="#f6f4ef">\n')
     over = " bar--over" if meta.get("hero") else ""
@@ -337,7 +344,7 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
   {caption_html(p["notes"])}
   {'<div class="photos">' + chr(10) + figs + chr(10) + '  </div>' if len(p["media"]) > 1 else ""}
   {f'<p><a href="{p["permalink"]}">See this post on Instagram</a></p>' if p["permalink"] else ""}
-  <script src="{{{{up}}}}assets/lightbox.js" defer></script>
+  <script src="{{{{up}}}}assets/lightbox.js?v={ver("lightbox.js")}" defer></script>
   {nav}
 </main>'''
     where = seo_place(p)
