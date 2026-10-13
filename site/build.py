@@ -187,8 +187,11 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
             + ('' if over else '<div class="stripe" aria-hidden="true"></div>\n')
             + body.replace("{{up}}", up) +
             '\n<footer><span class="stripe" aria-hidden="true"></span>Lola (white) and Ted (grey), two VW campers that like to travel together. '
-            f'Stories and photos from <a href="{IG}">@tedandlolasonlyvans</a>. Ian\'s astronomy pictures: <a href="https://uv101.uk">uv101.uk</a>. Site built by Claude.'
-            f'<br>© {datetime.date.today().year} only-vans.uk. Photos are ours; please ask before reusing them.</footer>\n')
+            f'Stories and photos from <a href="{IG}">@tedandlolasonlyvans</a>. Site built by Claude.'
+            f'<br>© {datetime.date.today().year} only-vans.uk. Photos are ours; please ask before reusing them.'
+            '<span class="sister">Ian\'s other sites: <a href="https://hifisounds.co.uk/">HiFi Sounds</a> · '
+            '<a href="https://db9v12.co.uk/">Aston Martin DB9 ownership</a> · '
+            '<a href="https://uv101.uk/">uv101 astrophotography</a></span></footer>\n')
     if not full:
         return head + page
     return ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
