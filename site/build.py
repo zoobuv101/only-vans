@@ -189,9 +189,9 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
             '\n<footer><span class="stripe" aria-hidden="true"></span>Lola (white) and Ted (grey), two VW campers that like to travel together. '
             f'Stories and photos from <a href="{IG}">@tedandlolasonlyvans</a>. Site built by Claude.'
             f'<br>© {datetime.date.today().year} only-vans.uk. Photos are ours; please ask before reusing them.'
-            '<span class="sister">Ian\'s other sites: <a href="https://hifisounds.co.uk/" title="My HiFi related pages">HiFi Sounds</a> · '
-            '<a href="https://db9v12.co.uk/" title="Information relating to ownership and maintenance of the awesome Aston Martin DB9">Aston Martin DB9 ownership</a> · '
-            '<a href="https://uv101.uk/" title="My astronomy page detailing our telescope shoots and awesome astrophotography">uv101 astrophotography</a></span></footer>\n')
+            '<span class="sister">Ian\'s other sites: <a href="https://hifisounds.co.uk/" data-tip="My HiFi related pages">HiFi Sounds</a> · '
+            '<a href="https://db9v12.co.uk/" data-tip="Information relating to ownership and maintenance of the awesome Aston Martin DB9">Aston Martin DB9 ownership</a> · '
+            '<a href="https://uv101.uk/" data-tip="My astronomy page detailing our telescope shoots and awesome astrophotography">uv101 astrophotography</a></span></footer>\n')
     if not full:
         return head + page
     return ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'

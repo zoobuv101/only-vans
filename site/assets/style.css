@@ -97,7 +97,14 @@ figure.wide img { width: auto; max-width: 100%; max-height: min(44rem, 80vh); ma
 footer { max-width: 72rem; margin: 0 auto; padding-block: 0 2.5rem; font: 400 0.75rem/1.7 var(--mono); color: var(--dim); }
 footer .stripe { margin-bottom: 1.5rem; height: 4px; }
 footer .sister { display: block; margin-top: 0.6rem; font-size: 0.68rem; opacity: 0.8; }
+footer .sister { position: relative; }
 footer .sister a { color: inherit; }
+/* Instant hover descriptions (the browser's own title tooltip has a fixed ~1s delay) */
+footer .sister a[data-tip]::after { content: attr(data-tip); position: absolute; left: 0; bottom: calc(100% + 0.4rem);
+  max-width: min(100%, 26rem); padding: 0.35rem 0.6rem; border-radius: 4px; background: var(--ink); color: var(--paper);
+  font-size: 0.7rem; line-height: 1.4; pointer-events: none; opacity: 0; transform: translateY(3px);
+  transition: opacity 0.1s ease, transform 0.1s ease; }
+footer .sister a[data-tip]:hover::after, footer .sister a[data-tip]:focus-visible::after { opacity: 1; transform: none; }
 
 /* front page hero: title over the photo, header floats on top (text stays light on the dark gradient in both themes) */
 .bar--over { position: absolute; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 2; padding-inline: 16px; max-width: none; }
