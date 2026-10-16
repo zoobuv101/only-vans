@@ -5,7 +5,9 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "47 5 * * *"   # daily 05:47 UTC (06:47 BST / 05:47 GMT)
+    # 3× daily so a late or dropped GitHub run only delays a new post by hours, not a day.
+    # :47 avoids the top-of-hour rush. 05:47 / 11:47 / 17:47 UTC (06:47 / 12:47 / 18:47 BST).
+    - cron: "47 5,11,17 * * *"
 
 permissions:
   contents: write
