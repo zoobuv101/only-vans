@@ -59,7 +59,7 @@ HANDLES = {k: v for k, v in json.load(open(os.path.join(ROOT, "data", "handles.j
 def plain(text: str, n: int = 150) -> str:
     """Caption as readable plain text for summaries: our own handle -> "Ted & Lola", known handles ->
     names (data/handles.json), the trailing list of tagged people dropped, emoji removed."""
-    t = re.sub(r"[^\w\s.,!?'’&()@-]", " ", text)
+    t = re.sub(r"[^\w\s.,:!?'’&()@-]", " ", text)
     t = re.sub(r"\s+", " ", t).strip()
     while True:  # drop the tag list at the end (but never our own handle)
         m = re.search(r"\s*@([A-Za-z0-9_.]+?)\.?$", t)
@@ -114,7 +114,7 @@ def load_posts() -> list[dict]:
         when = datetime.date.fromisoformat(o["date"]) if dated else local(p["timestamp"]).date()
         end = datetime.date.fromisoformat(o["end"]) if o.get("end") else None
         title = o.get("title") or plain(p["caption"], 60) or "On the road"
-        p.update(title=title, place=o.get("place", ""), seo_place=o.get("seo_place", ""), at=o.get("at"), notes=o.get("notes", ""), when_text=o.get("when_text", ""), vans=o.get("vans", "Ted & Lola"),
+        p.update(title=title, place=o.get("place", ""), seo_place=o.get("seo_place", ""), seo_title=o.get("seo_title", ""), description=o.get("description", ""), at=o.get("at"), notes=o.get("notes", ""), when_text=o.get("when_text", ""), vans=o.get("vans", "Ted & Lola"),
                  when=when, end=end, dated=dated, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
                  slug=f"{when:%Y-%m-%d}-{slugify(title)}")
         out.append(p)
@@ -319,6 +319,17 @@ def seo_place(p: dict) -> str:
     return keep if len(keep) <= 35 else (parts[-1] if parts else "")
 
 
+def description(p: dict) -> str:
+    """Meta description: an override, else the caption, topped up with our notes when the caption alone
+    is too short for the 140–160 characters search results show."""
+    if p["description"]:
+        return p["description"]
+    t = plain(p["caption"], 10**6)
+    if len(t) < 140 and p["notes"]:
+        t += (" " if t[-1:] in "!?" else ". ") + plain(p["notes"], 10**6) if t else plain(p["notes"], 10**6)
+    return plain(t, 155)
+
+
 def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, str]:
     figs = "\n".join(
         f'    <a href="{{{{up}}}}{m["src"]}"><img src="{{{{up}}}}{thumb(m)}" alt="Photo {i + 1} from {esc(p["title"])}" loading="lazy" width="{m["w"]}" height="{m["h"]}"></a>'
@@ -348,8 +359,9 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
   {nav}
 </main>'''
     where = seo_place(p)
-    meta = {"title": f'{p["title"]}{", " + where if where else ""} · Only Vans', "headline": p["title"],
-            "description": plain(p["caption"], 155), "image": c["src"],
+    # seo_title (overrides) shortens the <title> only: the page heading and URL (from "title") stay put
+    meta = {"title": f'{p["seo_title"] or p["title"] + (", " + where if where else "")} · Only Vans', "headline": p["title"],
+            "description": description(p), "image": c["src"],
             "date": "" if p["when_text"] else f'{p["when"]:%Y-%m-%d}', "noindex": bool(p["when_text"])}
     return meta, body
 
