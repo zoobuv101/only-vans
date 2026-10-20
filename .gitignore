@@ -11,3 +11,6 @@ site/preview/
 # local working notes — kept out of the public repo
 CLAUDE.md
 __pycache__/
+# Telegram channel state (allowlist, inbox) — local only
+.telegram/
+.claude/telegram-bot.settings.json

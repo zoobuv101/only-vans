@@ -136,6 +136,14 @@ def scan(imei, key, home, first, last):
 
 def report(trips, home, label):
     print(f"\n=== {label}")
+    if os.environ.get("ONLY_VANS_BOT"):  # the Telegram bot: never reveal where Lola is now
+        today = D.datetime.now(D.timezone.utc).date()
+        live = [t for t in trips if t[-1]["leave"] is None or t[-1]["end"] >= today]
+        trips = [t for t in trips if t not in live]
+        if live:
+            print("  A trip is still in progress (or ended today) — its location is not shown via the bot.")
+            if not trips:
+                return
     if not trips:
         print("  No nights away (> 10 miles from home) — a day trip, or posted long after the trip:"
               " rerun with --from/--to around the trip dates.")

@@ -8,7 +8,7 @@
 IndexNow (Bing, Yandex, Seznam, Naver; DuckDuckGo uses Bing) — Google doesn't take part. The key isn't
 a secret: it is served at /<key>.txt so the engines can check the ping came from this site.
 Google: resubmits sitemap.xml through the Search Console API as service account
-only-vans-sitemap@only-vans-511419.iam.gserviceaccount.com ("Full" user on the property). Its JSON key
+sitemap-updater@zoob-sites-search.iam.gserviceaccount.com (user on the property). Its JSON key
 comes from env GSC_SA_KEY (GitHub secret) or the file named in GSC_SA_FILE; needs google-auth + requests.
 Failures print a warning but never fail the deploy.
 """
