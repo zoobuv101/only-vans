@@ -23,6 +23,9 @@ SITE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(SITE)
 DOMAIN = "only-vans.uk"
 IG = "https://www.instagram.com/tedandlolasonlyvans/"
+# Cloudflare Web Analytics (web_manager, 2026-10-21): every visit, not just search traffic. The token is public.
+CF_BEACON = ('<!-- Cloudflare Web Analytics --><script type=\'module\' src=\'https://static.cloudflareinsights.com/beacon.min.js\' '
+             'data-cf-beacon=\'{"token": "ab742bc726ae436d8eafcee81a47dd64"}\'></script><!-- End Cloudflare Web Analytics -->\n')
 LONDON = ZoneInfo("Europe/London")
 HERO = ("18115457765014274", 0)  # both vans, tops up, outside Winchester
 NAV = [("adventures", "index.html#adventures", "Adventures"), ("map", "index.html#map", "Map"), ("ig", IG, "Instagram")]
@@ -151,7 +154,7 @@ def ver(name: str) -> str:
     return hashlib.sha1(open(os.path.join(SITE, "assets", name), "rb").read()).hexdigest()[:8]
 
 
-def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "index.html") -> str:
+def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "index.html", beacon: bool = True) -> str:
     up = "../" * depth
     url = f"https://{DOMAIN}/" + ("" if rel == "index.html" else rel)
     title, desc = esc(meta["title"]), esc(meta.get("description", ""))
@@ -203,7 +206,9 @@ def layout(body: str, meta: dict, depth: int, full: bool = True, rel: str = "ind
         return head + page
     return ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-            + head + '</head>\n<body>\n' + page + '</body>\n</html>\n')
+            + head + '</head>\n<body>\n' + page
+            + (CF_BEACON if beacon and not meta.get("noindex") else "")  # not on noindex pages or previews
+            + '</body>\n</html>\n')
 
 
 def index_page(posts: list[dict]) -> tuple[dict, str]:
@@ -381,7 +386,7 @@ def build(preview: bool = False) -> str:
         full = not (preview and rel == "index.html")  # the Artifact wraps its own entry page
         dst = os.path.join(out, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
-        open(dst, "w").write(layout(body, meta, rel.count("/"), full, rel))
+        open(dst, "w").write(layout(body, meta, rel.count("/"), full, rel, beacon=not preview))
     if not preview:
         open(os.path.join(out, "CNAME"), "w").write(DOMAIN + "\n")
         newest = max(d for _, d, *_ in pages if d)  # the front page changes when a post arrives
