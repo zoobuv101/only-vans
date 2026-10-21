@@ -14,3 +14,7 @@ __pycache__/
 # Telegram channel state (allowlist, inbox) — local only
 .telegram/
 .claude/telegram-bot.settings.json
+# keys never go in the repo (web_manager site-session rule 7)
+*service-account*.json
+gsc-key*.json
+*.pem
