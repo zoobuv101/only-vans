@@ -329,9 +329,12 @@ def description(p: dict) -> str:
     is too short for the 140–160 characters search results show."""
     if p["description"]:
         return p["description"]
-    t = plain(p["caption"], 10**6)
+    def clean(x: str) -> str:  # no links, no trailing #tags (web_manager, 25 Oct 2026); the page keeps the caption as is
+        x = re.sub(r"https?://\S+|\b(?:www\.)?only-vans\.uk\S*", " ", x)
+        return plain(re.sub(r"(?:\s*#\w+)+\s*$", "", x.rstrip()), 10**6)
+    t = clean(p["caption"])
     if len(t) < 140 and p["notes"]:
-        t += (" " if t[-1:] in "!?" else ". ") + plain(p["notes"], 10**6) if t else plain(p["notes"], 10**6)
+        t += (" " if t[-1:] in "!?" else ". ") + clean(p["notes"]) if t else clean(p["notes"])
     return plain(t, 155)
 
 
