@@ -395,7 +395,12 @@ def build(preview: bool = False) -> str:
         open(os.path.join(out, "sitemap.xml"), "w").write(
             '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
             + urls + '</urlset>\n')
-        open(os.path.join(out, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: https://{DOMAIN}/sitemap.xml\n")
+        ai = ("GPTBot ClaudeBot anthropic-ai CCBot Google-Extended Applebot-Extended Bytespider meta-externalagent "
+              "Amazonbot cohere-ai Diffbot Timpibot ImagesiftBot omgili").split()  # AI training crawlers (web_manager, 25 Oct 2026)
+        open(os.path.join(out, "robots.txt"), "w").write(
+            "# AI training crawlers: not allowed (web_manager, Ian's go 25 Oct 2026)\n"
+            + "".join(f"User-agent: {b}\n" for b in ai) + "Disallow: /\n\n"
+            f"User-agent: *\nAllow: /\n\nSitemap: https://{DOMAIN}/sitemap.xml\n")
         open(os.path.join(out, ".nojekyll"), "w").write("")
         nf = layout('<main class="page">\n  <p class="eyebrow">Error 404</p>\n  <h1>Wrong turning</h1>\n'
                     '  <p>This page has gone off-grid. Head back to <a href="index.html#adventures">all the adventures</a>'
