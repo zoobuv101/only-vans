@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy2.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -37,25 +37,46 @@ jobs:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: python3 scripts/sync_instagram.py
 
+      # Build first: it gives each new post its address and stores it in data/slugs.json, which is
+      # committed with the post so a later caption edit can never move a published URL.
+      - name: Build site
+        run: python3 site/build.py
+
       - name: Commit new posts and photos
         run: |
           git config user.name "instagram-sync-bot"
           git config user.email "actions@github.com"
-          git add data/posts.json site/img/ig
+          git add data/posts.json data/slugs.json site/img/ig
           git commit -m "Sync Instagram posts $(date -u +%F)" && git push || echo "No new posts."
-
-      - name: Build site
-        run: python3 site/build.py
 
       - name: Find pages that changed (for search engines)
         continue-on-error: true
         run: python3 scripts/notify_search.py diff
 
+      # GitHub sometimes loses the artifact ("No artifacts named github-pages", 14 Nov 2026). Try the
+      # upload + deploy pair once more under a fresh artifact name; if that fails too the run fails
+      # and GitHub emails Ian.
       - uses: actions/upload-pages-artifact@v3
+        continue-on-error: true
         with:
           path: site/public
       - id: deploy
+        continue-on-error: true
         uses: actions/deploy-pages@v4
+
+      - name: Deploy failed, wait before one retry
+        if: steps.deploy.outcome != 'success'
+        run: sleep 60
+      - if: steps.deploy.outcome != 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages-retry
+          path: site/public
+      - id: deploy2
+        if: steps.deploy.outcome != 'success'
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-retry
 
       - name: Tell search engines (IndexNow)
         continue-on-error: true

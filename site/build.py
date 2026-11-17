@@ -91,7 +91,17 @@ def slugify(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower().replace("'", "")).strip("-")[:60]
 
 
-def load_posts() -> list[dict]:
+SLUGS = os.path.join(ROOT, "data", "slugs.json")          # post id -> slug, fixed the first time a post is built
+REDIRECTS = os.path.join(ROOT, "data", "redirects.json")  # old adventure slug -> current slug
+
+
+def load_posts(remember: bool = True) -> list[dict]:
+    """remember=False (previews): new posts get a slug but it is not stored."""
+    # A published address never moves: the slug is made from date + title ONCE and kept in data/slugs.json,
+    # so a later caption/title/date edit changes the page, not its URL (web_manager, 17 Nov 2026).
+    # To move a page on purpose: change its slug there AND add "old": "new" to data/redirects.json.
+    slugs = json.load(open(SLUGS)) if os.path.exists(SLUGS) else {}
+    known = dict(slugs)
     posts = json.load(open(os.path.join(ROOT, "data", "posts.json")))
     over = json.load(open(os.path.join(ROOT, "data", "overrides.json")))
     # Trips that never went on Instagram (photos from Google Photos etc.), same keys as overrides
@@ -119,8 +129,10 @@ def load_posts() -> list[dict]:
         title = o.get("title") or plain(p["caption"], 60) or "On the road"
         p.update(title=title, place=o.get("place", ""), seo_place=o.get("seo_place", ""), seo_title=o.get("seo_title", ""), description=o.get("description", ""), at=o.get("at"), notes=o.get("notes", ""), when_text=o.get("when_text", ""), vans=o.get("vans", "Ted & Lola"),
                  when=when, end=end, dated=dated, cover=p["media"][min(o.get("cover", 0), len(p["media"]) - 1)],
-                 slug=f"{when:%Y-%m-%d}-{slugify(title)}")
+                 slug=slugs.setdefault(p["id"], f"{when:%Y-%m-%d}-{slugify(title)}"))
         out.append(p)
+    if remember and slugs != known:
+        open(SLUGS, "w").write(json.dumps(slugs, indent=1, ensure_ascii=False) + "\n")
     out.sort(key=lambda x: (x["when"], x["timestamp"]), reverse=True)
     return out
 
@@ -374,12 +386,28 @@ def post_page(p: dict, newer: dict | None, older: dict | None) -> tuple[dict, st
     return meta, body
 
 
+def redirect_pages(out: str, live: set[str]) -> None:
+    """Old addresses that moved: a tiny noindex page that forwards to the current one. Not in the sitemap."""
+    moved = json.load(open(REDIRECTS)) if os.path.exists(REDIRECTS) else {}
+    for old, new in moved.items():
+        if old.startswith("_") or old in live:  # never overwrite a real page
+            continue
+        if new not in live:
+            sys.exit(f"data/redirects.json: {old} points to {new}, which is not a page")
+        url = f"https://{DOMAIN}/adventures/{new}.html"
+        open(os.path.join(out, "adventures", old + ".html"), "w").write(
+            '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Moved · Only Vans</title>\n'
+            '<meta name="robots" content="noindex">\n'
+            f'<link rel="canonical" href="{url}">\n<meta http-equiv="refresh" content="0; url={url}">\n'
+            f'</head>\n<body>\n<p>This page has moved to <a href="{url}">{url}</a>.</p>\n</body>\n</html>\n')
+
+
 def build(preview: bool = False) -> str:
     out = os.path.join(SITE, "preview" if preview else "public")
     os.makedirs(out, exist_ok=True)
     for sub in ("assets", "img"):
         shutil.copytree(os.path.join(SITE, sub), os.path.join(out, sub), dirs_exist_ok=True)
-    posts = load_posts()
+    posts = load_posts(remember=not preview)
     thumbs(posts, out)
     pages = [("index.html", None, *index_page(posts))]
     for i, p in enumerate(posts):
@@ -391,6 +419,7 @@ def build(preview: bool = False) -> str:
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         open(dst, "w").write(layout(body, meta, rel.count("/"), full, rel, beacon=not preview))
     if not preview:
+        redirect_pages(out, {p["slug"] for p in posts})
         open(os.path.join(out, "CNAME"), "w").write(DOMAIN + "\n")
         newest = max(d for _, d, *_ in pages if d)  # the front page changes when a post arrives
         urls = "".join(f"  <url><loc>https://{DOMAIN}/{'' if r == 'index.html' else r}</loc><lastmod>{d or newest}</lastmod></url>\n"
